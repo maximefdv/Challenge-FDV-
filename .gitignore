@@ -4,3 +4,4 @@ knowledge/private/*
 !knowledge/private/.gitkeep
 sessions/
 *.log
+demo/private/

@@ -2,15 +2,18 @@ import fs from "node:fs";
 import path from "node:path";
 
 const ROOT = "knowledge";
+const PRIVATE = path.join(ROOT, "private");
+const listDocs = (dir) =>
+  fs.existsSync(dir)
+    ? fs.readdirSync(dir).filter((f) => /\.(md|txt)$/.test(f)).sort().map((f) => path.join(dir, f))
+    : [];
 
-// Charge knowledge/*.md puis knowledge/private/*.md (docs réels, ignorés par git).
+// Docs réels (knowledge/private, ignorés par git) prioritaires : s'il y en a, on n'injecte pas
+// les docs fictifs pour éviter de mélanger deux offres. KNOWLEDGE=demo force les docs fictifs.
 // Ordre trié = préfixe stable pour le cache de prompt.
 export function loadKnowledge() {
-  const files = [ROOT, path.join(ROOT, "private")]
-    .filter((dir) => fs.existsSync(dir))
-    .flatMap((dir) =>
-      fs.readdirSync(dir).filter((f) => /\.(md|txt)$/.test(f)).sort().map((f) => path.join(dir, f)),
-    );
+  const prives = listDocs(PRIVATE);
+  const files = prives.length && process.env.KNOWLEDGE !== "demo" ? prives : listDocs(ROOT);
   const text = files
     .map((f) => `=== SOURCE: ${path.basename(f)} ===\n${fs.readFileSync(f, "utf8").trim()}`)
     .join("\n\n");

@@ -17,7 +17,8 @@ En ligne de commande : `npm run replay` (ou `replay:mock`), option `--realtime` 
 
 ## Base documentaire
 - `knowledge/*.md` : documents fictifs (offre, tarifs, cas clients, FAQ, objections).
-- `knowledge/private/*.md|.txt` : vos vrais documents (ignorés par git), chargés automatiquement.
+- `knowledge/private/*.md|.txt` : vos vrais documents (ignorés par git). S'ils existent, ils remplacent les docs fictifs (`KNOWLEDGE=demo` pour forcer les fictifs).
+- `DEMO_FILE=chemin.json` : choisir le transcript rejoué par le bouton démo.
 
 ## Sécurité / RGPD
 Clés API uniquement dans `.env`. Aucun transcript stocké par défaut. Informer le prospect de l'assistance IA en début de RDV.

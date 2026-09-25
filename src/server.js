@@ -8,7 +8,7 @@ import { createSession } from "./session.js";
 
 const PORT = Number(process.env.PORT) || 3000;
 const mock = process.argv.includes("--mock") || !config.hasAnthropicKey;
-const DEMO_FILE = "demo/rdv-decouverte.json";
+const DEMO_FILE = process.env.DEMO_FILE || "demo/rdv-decouverte.json";
 
 const app = express();
 app.use(express.static("public"));
