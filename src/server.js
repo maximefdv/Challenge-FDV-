@@ -13,6 +13,11 @@ const mode = resolveMode({ forceMock: process.argv.includes("--mock"), hasKey: c
 
 const app = express();
 app.use(express.static("public"));
+// Texte du scénario (sans analyses) pour la page de mise en scène vidéo public/video.html
+app.get("/api/scenario", (_req, res) => {
+  const { titre, repliques } = loadScenario(DEMO_FILE);
+  res.json({ titre, repliques: repliques.map(({ t, qui, texte }) => ({ t, qui, texte })) });
+});
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: "/ws" });
 
@@ -34,7 +39,7 @@ wss.on("connection", (ws) => {
       send({ type: "session", titre: rdv.titre, ...session.info });
       const speed = Number(msg.speed) || 1;
       for (const r of rdv.repliques) timers.push(setTimeout(() => session.addReplique(r), r.t / speed));
-      const fin = rdv.repliques.at(-1).t / speed + 2500; // laisse arriver la dernière analyse
+      const fin = (rdv.finMs ?? rdv.repliques.at(-1).t + 2500) / speed; // laisse arriver la dernière analyse
       timers.push(setTimeout(() => send({ type: "fin" }), fin));
     } else if (msg.type === "stop") {
       stop();

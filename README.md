@@ -15,6 +15,8 @@ npm run start:mock          # force le mode mots-clés
 
 Astuce : ouvrir la page en demi-écran à côté de Teams (mise en page adaptée).
 
+Vidéo de démo : `http://localhost:3000/video.html` = appel visio simulé + Souffleur côte à côte (option `finMs` dans le scénario pour retarder la fin).
+
 En ligne de commande : `npm run replay` (ou `replay:mock`), option `--realtime` pour respecter le timing.
 
 ## Base documentaire
