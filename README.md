@@ -9,8 +9,10 @@ Copilote temps réel pour les RDV de découverte B2B sur Teams : il écoute l'é
 npm install
 cp .env.example .env        # renseigner ANTHROPIC_API_KEY
 npm start                   # → http://localhost:3000 puis « Lancer la démo »
-npm run start:mock          # interface sans clé API (détection par mots-clés)
+npm run start:mock          # force le mode mots-clés
 ```
+**Modes** : `claude` (clé API présente, analyse en direct) · `precalc` (sans clé : rejoue les analyses enregistrées dans le scénario) · `mock` (mots-clés, tests).
+
 Astuce : ouvrir la page en demi-écran à côté de Teams (mise en page adaptée).
 
 En ligne de commande : `npm run replay` (ou `replay:mock`), option `--realtime` pour respecter le timing.
@@ -18,7 +20,8 @@ En ligne de commande : `npm run replay` (ou `replay:mock`), option `--realtime` 
 ## Base documentaire
 - `knowledge/*.md` : documents fictifs (offre, tarifs, cas clients, FAQ, objections).
 - `knowledge/private/*.md|.txt` : vos vrais documents (ignorés par git). S'ils existent, ils remplacent les docs fictifs (`KNOWLEDGE=demo` pour forcer les fictifs).
-- `DEMO_FILE=chemin.json` : choisir le transcript rejoué par le bouton démo.
+- `knowledge/private/checklist.json` : votre checklist de découverte `{ "cle": "Libellé" }`.
+- Scénario de démo : `DEMO_FILE`, sinon `demo/private/*.json` (ignoré par git), sinon `demo/rdv-decouverte.json`.
 
 ## Sécurité / RGPD
 Clés API uniquement dans `.env`. Aucun transcript stocké par défaut. Informer le prospect de l'assistance IA en début de RDV.

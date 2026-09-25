@@ -7,8 +7,8 @@
   "scripts": {
     "start": "node src/server.js",
     "start:mock": "node src/server.js --mock",
-    "replay": "node src/cli.js demo/rdv-decouverte.json",
-    "replay:mock": "node src/cli.js demo/rdv-decouverte.json --mock"
+    "replay": "node src/cli.js",
+    "replay:mock": "node src/cli.js --mock"
   },
   "engines": {
     "node": ">=20"

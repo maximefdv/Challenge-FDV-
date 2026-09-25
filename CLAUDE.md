@@ -15,7 +15,8 @@ Stack : Pipedrive, Lemlist, Lusha, M365/Outlook, Gmail, Google Calendar, Skipcal
 1. Idées → FAIT (choix : D "Le Souffleur")
 2. Plan → VALIDÉ. Contexte équipe : Teams desktop + Windows (capture = partage écran + son système)
 3. Dev : 1-3 FAITES (KB fictive, moteur src/souffleur.js, UI public/index.html + src/server.js ws, --mock).
-   Prochaine : 4 (audio Teams → Deepgram 2 canaux). Vrais docs Xerfi (3 PDF→txt) dans knowledge/private (gitignoré, prioritaires sur fictifs). En attente : clés
+   Prochaine : 4 (audio Teams → Deepgram 2 canaux). Docs Xerfi + checklist.json dans knowledge/private, scénario demo/private (gitignorés).
+   Pas de budget clé Anthropic → mode "precalc" (analyses pré-calculées dans le scénario) par défaut sans clé
 
 ## Idées proposées (Phase 1)
 - A-F proposées. Retenue : D "Le Souffleur" = copilote live en RDV découverte

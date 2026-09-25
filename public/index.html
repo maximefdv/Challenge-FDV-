@@ -48,7 +48,8 @@
   .card .top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
   .card .titre { font-weight: 700; font-size: 16px; color: var(--c); }
   .card .meta { font-size: 11px; color: var(--muted); white-space: nowrap; }
-  .card .dire { font-size: 19px; font-weight: 600; margin: 8px 0; }
+  .card .lbl { font-size: 10.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+  .card .dire { font-size: 19px; font-weight: 600; margin: 2px 0 8px; }
   .card:not(:first-child) .dire { font-size: 15px; }
   .card .row { font-size: 13.5px; margin-top: 4px; }
   .card .row b { color: var(--muted); font-weight: 600; }
@@ -104,7 +105,7 @@
 <script>
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
-let ws, labels = {}, etat = {}, latences = [];
+let ws, labels = {}, etat = {}, latences = [], termine = false;
 
 function connect() {
   ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws`);
@@ -114,11 +115,11 @@ function connect() {
 
 function handle(m) {
   if (m.type === "hello") {
-    $("status").textContent = m.mock ? "mode mock (sans IA)" : `IA : ${m.model}`;
-    $("status").classList.toggle("live", !m.mock);
+    $("status").textContent = { claude: `IA live : ${m.model}`, precalc: "démo pré-calculée", mock: "mode mock (mots-clés)" }[m.mode];
+    $("status").classList.toggle("live", m.mode === "claude");
     $("btnDemo").disabled = false;
   } else if (m.type === "session") {
-    labels = m.checklist; etat = {}; latences = [];
+    labels = m.checklist; etat = {}; latences = []; termine = false;
     $("titre").textContent = m.titre; $("titre").hidden = false;
     $("lines").innerHTML = ""; $("cards").innerHTML = '<div class="empty">À l\'écoute…</div>';
     $("latence").hidden = true;
@@ -141,7 +142,7 @@ function handle(m) {
     if (line) line.querySelector(".state").textContent = `⚠ ${m.message}`;
   } else if (m.type === "fin") {
     $("btnStop").disabled = true;
-    renderChecklist([], true);
+    termine = true; renderChecklist();
   }
 }
 
@@ -153,14 +154,15 @@ function addCard(m) {
   el.className = `card ${m.declencheur}`;
   el.innerHTML = `
     <div class="top"><span class="titre">${esc(c.titre)}</span><span class="meta">${esc(m.declencheur.replace("_", " "))} · ${(m.latenceMs / 1000).toFixed(1)} s</span></div>
+    <div class="lbl">Quoi dire</div>
     <div class="dire">« ${esc(c.reponse)} »</div>
-    <div class="row"><b>Preuve :</b> ${esc(c.preuve)}</div>
-    <div class="row"><b>Rebond :</b> ${esc(c.question_rebond)}</div>
+    ${c.preuve ? `<div class="row"><b>Preuve :</b> ${esc(c.preuve)}</div>` : ""}
+    <div class="row"><b>Question de rebond :</b> ${esc(c.question_rebond)}</div>
     <div class="chips">${c.sources.map((s) => `<span class="chip">📄 ${esc(s)}</span>`).join("")}</div>`;
   box.prepend(el); box.scrollTop = 0;
 }
 
-function renderChecklist(nouveaux = [], fin = false) {
+function renderChecklist(nouveaux = [], fin = termine) {
   const keys = Object.keys(labels);
   const ok = keys.filter((k) => etat[k]).length;
   $("score").textContent = keys.length ? `· ${ok}/${keys.length}` : "";

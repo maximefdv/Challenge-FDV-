@@ -1,14 +1,15 @@
 // Étape 3 : serveur web + WebSocket. Usage : node src/server.js [--mock]
-import fs from "node:fs";
 import http from "node:http";
 import express from "express";
 import { WebSocketServer } from "ws";
 import { config } from "./config.js";
 import { createSession } from "./session.js";
+import { resolveMode } from "./souffleur.js";
+import { scenarioPath, loadScenario } from "./scenario.js";
 
 const PORT = Number(process.env.PORT) || 3000;
-const mock = process.argv.includes("--mock") || !config.hasAnthropicKey;
-const DEMO_FILE = process.env.DEMO_FILE || "demo/rdv-decouverte.json";
+const DEMO_FILE = scenarioPath();
+const mode = resolveMode({ forceMock: process.argv.includes("--mock"), hasKey: config.hasAnthropicKey, scenario: loadScenario(DEMO_FILE) });
 
 const app = express();
 app.use(express.static("public"));
@@ -21,19 +22,19 @@ wss.on("connection", (ws) => {
   let timers = [];
   const stop = () => { timers.forEach(clearTimeout); timers = []; };
 
-  send({ type: "hello", mock, model: mock ? "mock" : config.modelLive });
+  send({ type: "hello", mode, model: config.modelLive });
 
   ws.on("message", (raw) => {
     let msg;
     try { msg = JSON.parse(raw); } catch { return; }
     if (msg.type === "demo") {
       stop();
-      const rdv = JSON.parse(fs.readFileSync(DEMO_FILE, "utf8"));
-      session = createSession(send, { mock });
+      const rdv = loadScenario(DEMO_FILE);
+      session = createSession(send, { mode });
       send({ type: "session", titre: rdv.titre, ...session.info });
       const speed = Number(msg.speed) || 1;
       for (const r of rdv.repliques) timers.push(setTimeout(() => session.addReplique(r), r.t / speed));
-      const fin = rdv.repliques.at(-1).t / speed + 1000;
+      const fin = rdv.repliques.at(-1).t / speed + 2500; // laisse arriver la dernière analyse
       timers.push(setTimeout(() => send({ type: "fin" }), fin));
     } else if (msg.type === "stop") {
       stop();
@@ -44,5 +45,5 @@ wss.on("connection", (ws) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`Le Souffleur → http://localhost:${PORT}  (${mock ? "mode mock" : config.modelLive})`);
+  console.log(`Le Souffleur → http://localhost:${PORT}  mode=${mode}  scénario=${DEMO_FILE}`);
 });

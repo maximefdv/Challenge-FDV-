@@ -2,9 +2,9 @@ import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { zodOutputFormat } from "@anthropic-ai/sdk/helpers/zod";
 import { config } from "./config.js";
-import { loadKnowledge } from "./knowledge.js";
+import { loadKnowledge, loadChecklist } from "./knowledge.js";
 
-export const CHECKLIST = {
+const DEFAULT_CHECKLIST = {
   besoin: "Besoin / douleur principale",
   volume: "Volume / taille du périmètre",
   solution_actuelle: "Solution ou outils actuels",
@@ -13,6 +13,7 @@ export const CHECKLIST = {
   delai: "Délai / échéance du projet",
   prochaine_etape: "Prochaine étape convenue",
 };
+export const CHECKLIST = loadChecklist() || DEFAULT_CHECKLIST;
 
 const Analyse = z.object({
   declencheur: z.enum(["aucun", "objection", "question", "signal_achat"]),
@@ -20,7 +21,7 @@ const Analyse = z.object({
     .object({
       titre: z.string().describe("5 mots max, ex: 'Objection prix'"),
       reponse: z.string().describe("Ce que le commercial peut dire, 2 phrases max, à l'oral"),
-      preuve: z.string().describe("Chiffre ou cas client tiré des documents"),
+      preuve: z.string().describe("Chiffre ou cas client tiré des documents, chaîne vide si aucun"),
       question_rebond: z.string().describe("Question à poser au prospect pour reprendre la main"),
       sources: z.array(z.string()).describe("Noms des fichiers SOURCE utilisés"),
     })
@@ -40,9 +41,11 @@ Tu reçois la transcription au fil de l'eau. Pour la DERNIÈRE réplique uniquem
 3. Indique les points de la checklist de découverte que cette réplique renseigne (info = fait appris, 10 mots max).
 Checklist : ${Object.entries(CHECKLIST).map(([k, v]) => `${k} (${v})`).join(", ")}.`;
 
-export function createSouffleur({ mock = false } = {}) {
+// mode : "claude" (appel API), "precalc" (analyses pré-calculées dans le scénario, sans clé API),
+// "mock" (mots-clés, tests hors ligne).
+export function createSouffleur({ mode = "claude" } = {}) {
   const knowledge = loadKnowledge();
-  const client = mock ? null : new Anthropic();
+  const client = mode === "claude" ? new Anthropic() : null;
   const system = [
     { type: "text", text: INSTRUCTIONS },
     { type: "text", text: `DOCUMENTS INTERNES :\n\n${knowledge.text}`, cache_control: { type: "ephemeral" } },
@@ -54,8 +57,14 @@ export function createSouffleur({ mock = false } = {}) {
   async function analyze(replique) {
     history.push(replique);
     const t0 = Date.now();
-    const result = mock ? mockAnalyze(replique) : await callClaude(replique);
-    if (mock && result.carte && cartesAffichees.includes(result.carte.titre)) result.carte = null;
+    let result;
+    if (mode === "claude") result = await callClaude(replique);
+    else if (mode === "precalc" && replique.analyse) result = await precalc(replique.analyse);
+    else {
+      result = mockAnalyze(replique);
+      if (result.carte && cartesAffichees.includes(result.carte.titre)) result.carte = null;
+    }
+    result.checklist = result.checklist.filter(({ item }) => item in CHECKLIST);
     if (result.carte) cartesAffichees.push(result.carte.titre);
     for (const { item, info } of result.checklist) checklist[item] = info;
     return { ...result, latenceMs: Date.now() - t0 };
@@ -82,6 +91,16 @@ DERNIÈRE RÉPLIQUE (${replique.qui}) : ${replique.texte}`;
   }
 
   return { analyze, checklist, knowledgeFiles: knowledge.files };
+}
+
+// Rejoue une analyse enregistrée avec une latence réaliste (0,9 à 1,6 s).
+const precalc = (analyse) =>
+  new Promise((ok) => setTimeout(() => ok(structuredClone(analyse)), 900 + Math.random() * 700));
+
+export function resolveMode({ forceMock, hasKey, scenario }) {
+  if (forceMock) return "mock";
+  if (hasKey) return "claude";
+  return scenario?.repliques?.some((r) => r.analyse) ? "precalc" : "mock";
 }
 
 // Mode hors ligne : détection par mots-clés, pour tester la chaîne sans clé API.

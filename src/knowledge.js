@@ -19,3 +19,9 @@ export function loadKnowledge() {
     .join("\n\n");
   return { files: files.map((f) => path.basename(f)), text };
 }
+
+// Checklist de découverte propre à l'offre : knowledge/private/checklist.json puis knowledge/checklist.json.
+export function loadChecklist() {
+  const f = [path.join(PRIVATE, "checklist.json"), path.join(ROOT, "checklist.json")].find((x) => fs.existsSync(x));
+  return f ? JSON.parse(fs.readFileSync(f, "utf8")) : null;
+}
