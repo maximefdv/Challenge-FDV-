@@ -55,6 +55,7 @@ export function createSouffleur({ mock = false } = {}) {
     history.push(replique);
     const t0 = Date.now();
     const result = mock ? mockAnalyze(replique) : await callClaude(replique);
+    if (mock && result.carte && cartesAffichees.includes(result.carte.titre)) result.carte = null;
     if (result.carte) cartesAffichees.push(result.carte.titre);
     for (const { item, info } of result.checklist) checklist[item] = info;
     return { ...result, latenceMs: Date.now() - t0 };

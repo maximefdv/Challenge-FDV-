@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le Souffleur</title>
+<style>
+  :root {
+    --bg: #f4f5f7; --panel: #ffffff; --line: #e3e6ea; --text: #1c2129; --muted: #6b7380;
+    --accent: #4f46e5; --objection: #ea580c; --question: #2563eb; --signal: #16a34a; --danger: #dc2626;
+    --card-shadow: 0 2px 10px rgba(20, 25, 35, .08);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1217; --panel: #171b22; --line: #262c36; --text: #e7eaf0; --muted: #8b93a1;
+      --accent: #818cf8; --objection: #fb923c; --question: #60a5fa; --signal: #4ade80; --danger: #f87171;
+      --card-shadow: 0 2px 12px rgba(0, 0, 0, .35);
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 "Segoe UI", system-ui, sans-serif; height: 100vh; display: flex; flex-direction: column; }
+  header { display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+  header h1 { font-size: 18px; margin: 0; }
+  .pill { font-size: 12px; padding: 3px 9px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); }
+  .pill.live { color: var(--signal); border-color: currentColor; }
+  .spacer { flex: 1; }
+  button, select { font: inherit; border-radius: 8px; border: 1px solid var(--line); background: var(--panel); color: var(--text); padding: 6px 12px; cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  button:disabled { opacity: .5; cursor: default; }
+  main { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(260px, 28%) 1fr minmax(240px, 24%); gap: 12px; padding: 12px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; display: flex; flex-direction: column; min-height: 0; }
+  section > h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0; padding: 12px 14px 8px; }
+  .scroll { overflow-y: auto; padding: 0 14px 14px; flex: 1; }
+  .empty { color: var(--muted); font-style: italic; padding: 8px 0; }
+
+  /* Transcript */
+  .line { padding: 6px 0; border-bottom: 1px dashed var(--line); font-size: 14px; }
+  .line .who { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+  .line.commercial .who { color: var(--accent); }
+  .line.prospect .who { color: var(--objection); }
+  .line .state { font-size: 11px; color: var(--muted); margin-left: 6px; }
+  .line.flagged { background: color-mix(in srgb, var(--objection) 8%, transparent); border-radius: 6px; padding-left: 6px; }
+
+  /* Cartes */
+  .card { border: 1px solid var(--line); border-left: 5px solid var(--c, var(--accent)); border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; box-shadow: var(--card-shadow); animation: pop .35s ease-out; }
+  .card.objection { --c: var(--objection); } .card.question { --c: var(--question); } .card.signal_achat { --c: var(--signal); }
+  .card:not(:first-child) { opacity: .6; transform: scale(.98); transform-origin: top; }
+  .card .top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .card .titre { font-weight: 700; font-size: 16px; color: var(--c); }
+  .card .meta { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .card .dire { font-size: 19px; font-weight: 600; margin: 8px 0; }
+  .card:not(:first-child) .dire { font-size: 15px; }
+  .card .row { font-size: 13.5px; margin-top: 4px; }
+  .card .row b { color: var(--muted); font-weight: 600; }
+  .chips { margin-top: 8px; display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { font-size: 11px; padding: 2px 8px; border-radius: 99px; background: var(--bg); border: 1px solid var(--line); color: var(--muted); }
+  @keyframes pop { from { transform: translateY(-8px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+  /* Checklist */
+  .progress { height: 6px; background: var(--bg); border-radius: 99px; margin: 0 14px 10px; overflow: hidden; }
+  .progress > div { height: 100%; width: 0; background: var(--signal); transition: width .4s; }
+  .item { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .item .ico { width: 22px; height: 22px; flex: none; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 13px; }
+  .item.ok .ico { background: var(--signal); border-color: var(--signal); color: #fff; }
+  .item.missing .ico { border-color: var(--danger); color: var(--danger); }
+  .item .label { font-weight: 600; font-size: 14px; }
+  .item .info { font-size: 12.5px; color: var(--muted); }
+  .item.missing .info { color: var(--danger); font-weight: 600; }
+  .item.flash { animation: flash 1s; }
+  @keyframes flash { 0% { background: color-mix(in srgb, var(--signal) 25%, transparent); } 100% { background: transparent; } }
+
+  #transcript { grid-area: transcript; } #cartes { grid-area: cartes; } #checklist { grid-area: checklist; }
+  main { grid-template-areas: "transcript cartes checklist"; }
+  /* Demi-écran à côté de Teams : cartes en grand, checklist + transcript empilés à droite */
+  @media (max-width: 1100px) {
+    main { grid-template-columns: 1fr minmax(240px, 34%); grid-template-rows: auto 1fr; grid-template-areas: "cartes checklist" "cartes transcript"; }
+    #checklist .item { padding: 5px 0; }
+  }
+  @media (max-width: 700px) {
+    body { height: auto; }
+    main { grid-template-columns: 1fr; grid-template-rows: none; grid-template-areas: "cartes" "checklist" "transcript"; }
+    section { max-height: 70vh; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>🎙️ Le Souffleur</h1>
+  <span class="pill" id="status">connexion…</span>
+  <span class="pill" id="titre" hidden></span>
+  <span class="spacer"></span>
+  <span class="pill" id="latence" hidden></span>
+  <select id="speed" title="Vitesse de la démo">
+    <option value="1">Démo ×1</option><option value="2">×2</option><option value="4">×4</option>
+  </select>
+  <button class="primary" id="btnDemo" disabled>▶ Lancer la démo</button>
+  <button id="btnStop" disabled>■ Stop</button>
+</header>
+<main>
+  <section id="transcript"><h2>Transcript</h2><div class="scroll" id="lines"><div class="empty">En attente du RDV…</div></div></section>
+  <section id="cartes"><h2>Cartes de réponse</h2><div class="scroll" id="cards"><div class="empty">Les réponses aux objections et questions du prospect apparaîtront ici.</div></div></section>
+  <section id="checklist"><h2>Checklist découverte <span id="score"></span></h2><div class="progress"><div id="bar"></div></div><div class="scroll" id="items"></div></section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+let ws, labels = {}, etat = {}, latences = [];
+
+function connect() {
+  ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws`);
+  ws.onmessage = (e) => handle(JSON.parse(e.data));
+  ws.onclose = () => { $("status").textContent = "déconnecté – reconnexion…"; $("status").classList.remove("live"); $("btnDemo").disabled = true; setTimeout(connect, 1500); };
+}
+
+function handle(m) {
+  if (m.type === "hello") {
+    $("status").textContent = m.mock ? "mode mock (sans IA)" : `IA : ${m.model}`;
+    $("status").classList.toggle("live", !m.mock);
+    $("btnDemo").disabled = false;
+  } else if (m.type === "session") {
+    labels = m.checklist; etat = {}; latences = [];
+    $("titre").textContent = m.titre; $("titre").hidden = false;
+    $("lines").innerHTML = ""; $("cards").innerHTML = '<div class="empty">À l\'écoute…</div>';
+    $("latence").hidden = true;
+    renderChecklist();
+    $("btnStop").disabled = false;
+  } else if (m.type === "replique") {
+    const el = document.createElement("div");
+    el.className = `line ${m.qui}`; el.id = `l${m.id}`;
+    el.innerHTML = `<span class="who">${m.qui}</span><span class="state">analyse…</span><div>${esc(m.texte)}</div>`;
+    $("lines").append(el); $("lines").scrollTop = $("lines").scrollHeight;
+  } else if (m.type === "analyse") {
+    const line = $(`l${m.id}`);
+    if (line) line.querySelector(".state").textContent = m.carte ? "💡 carte" : "";
+    if (m.carte) { line?.classList.add("flagged"); addCard(m); }
+    const nouveaux = m.checklist.map((c) => c.item);
+    etat = m.checklistEtat; renderChecklist(nouveaux);
+    latences.push(m.latenceMs); renderLatence();
+  } else if (m.type === "erreur") {
+    const line = $(`l${m.id}`);
+    if (line) line.querySelector(".state").textContent = `⚠ ${m.message}`;
+  } else if (m.type === "fin") {
+    $("btnStop").disabled = true;
+    renderChecklist([], true);
+  }
+}
+
+function addCard(m) {
+  const c = m.carte;
+  const box = $("cards");
+  box.querySelector(".empty")?.remove();
+  const el = document.createElement("div");
+  el.className = `card ${m.declencheur}`;
+  el.innerHTML = `
+    <div class="top"><span class="titre">${esc(c.titre)}</span><span class="meta">${esc(m.declencheur.replace("_", " "))} · ${(m.latenceMs / 1000).toFixed(1)} s</span></div>
+    <div class="dire">« ${esc(c.reponse)} »</div>
+    <div class="row"><b>Preuve :</b> ${esc(c.preuve)}</div>
+    <div class="row"><b>Rebond :</b> ${esc(c.question_rebond)}</div>
+    <div class="chips">${c.sources.map((s) => `<span class="chip">📄 ${esc(s)}</span>`).join("")}</div>`;
+  box.prepend(el); box.scrollTop = 0;
+}
+
+function renderChecklist(nouveaux = [], fin = false) {
+  const keys = Object.keys(labels);
+  const ok = keys.filter((k) => etat[k]).length;
+  $("score").textContent = keys.length ? `· ${ok}/${keys.length}` : "";
+  $("bar").style.width = keys.length ? `${(ok / keys.length) * 100}%` : "0";
+  $("items").innerHTML = keys.map((k) => {
+    const cls = etat[k] ? "ok" : fin ? "missing" : "";
+    const info = etat[k] ? esc(etat[k]) : fin ? "À creuser avant de raccrocher !" : "non abordé";
+    return `<div class="item ${cls} ${nouveaux.includes(k) ? "flash" : ""}"><div class="ico">${etat[k] ? "✓" : fin ? "!" : ""}</div><div><div class="label">${esc(labels[k])}</div><div class="info">${info}</div></div></div>`;
+  }).join("");
+}
+
+function renderLatence() {
+  const s = [...latences].sort((a, b) => a - b);
+  $("latence").textContent = `latence médiane ${(s[Math.floor(s.length / 2)] / 1000).toFixed(1)} s`;
+  $("latence").hidden = false;
+}
+
+$("btnDemo").onclick = () => ws.send(JSON.stringify({ type: "demo", speed: $("speed").value }));
+$("btnStop").onclick = () => ws.send(JSON.stringify({ type: "stop" }));
+connect();
+</script>
+</body>
+</html>

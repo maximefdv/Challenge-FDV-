@@ -14,7 +14,8 @@ Stack : Pipedrive, Lemlist, Lusha, M365/Outlook, Gmail, Google Calendar, Skipcal
 ## Phases
 1. Idées → FAIT (choix : D "Le Souffleur")
 2. Plan → VALIDÉ. Contexte équipe : Teams desktop + Windows (capture = partage écran + son système)
-3. Dev : étapes 1-2 FAITES (init, KB fictive, moteur CLI src/souffleur.js + --mock). Prochaine : 3 (UI web + ws)
+3. Dev : 1-3 FAITES (KB fictive, moteur src/souffleur.js, UI public/index.html + src/server.js ws, --mock).
+   Prochaine : 4 (audio Teams → Deepgram 2 canaux). En attente : clés Anthropic/Deepgram, vrais docs
 
 ## Idées proposées (Phase 1)
 - A-F proposées. Retenue : D "Le Souffleur" = copilote live en RDV découverte

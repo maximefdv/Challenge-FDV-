@@ -9,7 +9,7 @@ export function loadKnowledge() {
   const files = [ROOT, path.join(ROOT, "private")]
     .filter((dir) => fs.existsSync(dir))
     .flatMap((dir) =>
-      fs.readdirSync(dir).filter((f) => f.endsWith(".md")).sort().map((f) => path.join(dir, f)),
+      fs.readdirSync(dir).filter((f) => /\.(md|txt)$/.test(f)).sort().map((f) => path.join(dir, f)),
     );
   const text = files
     .map((f) => `=== SOURCE: ${path.basename(f)} ===\n${fs.readFileSync(f, "utf8").trim()}`)

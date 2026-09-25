@@ -5,6 +5,8 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "start": "node src/server.js",
+    "start:mock": "node src/server.js --mock",
     "replay": "node src/cli.js demo/rdv-decouverte.json",
     "replay:mock": "node src/cli.js demo/rdv-decouverte.json --mock"
   },
@@ -14,6 +16,8 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",
     "dotenv": "^18.0.3",
+    "express": "^5.2.1",
+    "ws": "^8.21.3",
     "zod": "^4.6.5"
   }
 }
