@@ -19,10 +19,9 @@ Stack : Pipedrive, Lemlist, Lusha, M365/Outlook, Gmail, Google Calendar, Skipcal
    Pas de budget clé Anthropic → mode "precalc" par défaut. UI v2 "produit" (?kiosk&theme=dark). Vidéo 1 min
    (public/video.html + TTS Kokoro, outillage hors repo). Scénarios demo/private/video-60s.json
 
-## Idées (Phase 1)
+## Idée
 - A-F proposées. Retenue : D "Le Souffleur" = copilote live en RDV découverte
   (audio → transcription streaming → Claude + docs internes → cartes réponse + checklist découverte → CR/Pipedrive)
-
 ## Décisions
 - Node.js (Express + ws), front HTML/JS vanilla, pas de base vectorielle : docs .md en contexte + prompt caching
 - Live : Claude Haiku 4.5 ; CR fin de RDV : Sonnet 5. STT : Deepgram streaming (fr)
