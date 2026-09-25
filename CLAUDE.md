@@ -18,10 +18,9 @@ Stack : Pipedrive, Lemlist, Lusha, M365/Outlook, Gmail, Google Calendar, Skipcal
    Prochaine : 4 (audio Teams → Deepgram 2 canaux). Docs Xerfi + checklist.json dans knowledge/private, scénario demo/private (gitignorés).
    Pas de budget clé Anthropic → mode "precalc" (analyses pré-calculées dans le scénario) par défaut sans clé
 
-## Idées proposées (Phase 1)
+## Idées (Phase 1)
 - A-F proposées. Retenue : D "Le Souffleur" = copilote live en RDV découverte
   (audio → transcription streaming → Claude + docs internes → cartes réponse + checklist découverte → CR/Pipedrive)
-- Bonus possible : E "Sparring Partner" (réutilise la base docs)
 
 ## Décisions
 - Node.js (Express + ws), front HTML/JS vanilla, pas de base vectorielle : docs .md en contexte + prompt caching
