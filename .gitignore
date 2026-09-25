@@ -5,3 +5,5 @@ knowledge/private/*
 sessions/
 *.log
 demo/private/
+tools/video/voices
+out/
