@@ -27,5 +27,4 @@ Stack : Pipedrive, Lemlist, Lusha, M365/Outlook, Gmail, Google Calendar, Skipcal
 - Live : Claude Haiku 4.5 ; CR fin de RDV : Sonnet 5. STT : Deepgram streaming (fr)
 - 3 modes d'entrée : transcript rejoué (sans STT) / fichier audio / live (onglet + micro)
 
-## Branche
-claude/sales-automation-challenge-3keafc
+Branche : claude/sales-automation-challenge-3keafc
