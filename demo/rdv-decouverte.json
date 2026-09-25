@@ -1,0 +1,20 @@
+{
+  "titre": "RDV découverte FICTIF – Transports Delmas (logistique, 260 salariés)",
+  "participants": { "commercial": "Commercial", "prospect": "Claire Martin (Resp. administrative et financière)" },
+  "repliques": [
+    { "t": 0,     "qui": "commercial", "texte": "Bonjour Claire, merci pour votre temps. Pour commencer, comment gérez-vous aujourd'hui les notes de frais chez Transports Delmas ?" },
+    { "t": 6000,  "qui": "prospect",   "texte": "Honnêtement c'est encore beaucoup de papier. Les chauffeurs nous envoient des photos de tickets par mail et la compta ressaisit tout dans Cegid." },
+    { "t": 13000, "qui": "commercial", "texte": "D'accord. Et ça représente combien de notes par mois à peu près ?" },
+    { "t": 17000, "qui": "prospect",   "texte": "Je dirais trois cents, trois cent cinquante par mois. Et on a deux personnes qui y passent une bonne partie de leur semaine." },
+    { "t": 24000, "qui": "prospect",   "texte": "Par contre, vous êtes compatibles avec Cegid ? Parce qu'on ne va pas changer de compta." },
+    { "t": 31000, "qui": "commercial", "texte": "Bien sûr. Et côté achats, vous avez un circuit de validation ?" },
+    { "t": 36000, "qui": "prospect",   "texte": "Pas vraiment, les chefs d'agence commandent un peu comme ils veulent, on découvre les factures après." },
+    { "t": 43000, "qui": "prospect",   "texte": "Après je vous préviens, on a regardé une autre solution l'an dernier et c'était vraiment trop cher pour nous." },
+    { "t": 52000, "qui": "commercial", "texte": "Je comprends. Vous aviez une enveloppe en tête pour ce type de projet ?" },
+    { "t": 57000, "qui": "prospect",   "texte": "Pas vraiment défini, mais si c'est plus de trente mille euros par an ça ne passera pas." },
+    { "t": 64000, "qui": "prospect",   "texte": "Et puis notre DSI est très pointilleux sur la sécurité, il voudra savoir où sont hébergées les données." },
+    { "t": 72000, "qui": "commercial", "texte": "C'est un point important. Qui d'autre serait impliqué dans la décision ?" },
+    { "t": 77000, "qui": "prospect",   "texte": "Il faudra que j'en parle à notre DAF, c'est lui qui tranche au final. Mais bon, je ne sais pas si les chauffeurs vont vraiment utiliser une appli." },
+    { "t": 86000, "qui": "commercial", "texte": "Très bien, merci Claire. Je vous propose de vous envoyer une synthèse et on cale un prochain échange." }
+  ]
+}

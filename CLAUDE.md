@@ -13,8 +13,8 @@ Stack : Pipedrive, Lemlist, Lusha, M365/Outlook, Gmail, Google Calendar, Skipcal
 
 ## Phases
 1. Idées → FAIT (choix : D "Le Souffleur")
-2. Plan : archi, stack, clés API, 6 étapes → EN COURS (attente validation)
-3. Dev étape par étape + point court (fait / à faire / blocage)
+2. Plan → VALIDÉ. Contexte équipe : Teams desktop + Windows (capture = partage écran + son système)
+3. Dev : étapes 1-2 FAITES (init, KB fictive, moteur CLI src/souffleur.js + --mock). Prochaine : 3 (UI web + ws)
 
 ## Idées proposées (Phase 1)
 - A-F proposées. Retenue : D "Le Souffleur" = copilote live en RDV découverte

@@ -1,0 +1,19 @@
+{
+  "name": "le-souffleur",
+  "version": "0.1.0",
+  "description": "Copilote temps réel pour RDV de découverte B2B (Teams) : objections → réponses sourcées",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "replay": "node src/cli.js demo/rdv-decouverte.json",
+    "replay:mock": "node src/cli.js demo/rdv-decouverte.json --mock"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.128.0",
+    "dotenv": "^18.0.3",
+    "zod": "^4.6.5"
+  }
+}
