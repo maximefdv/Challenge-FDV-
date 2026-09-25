@@ -3,54 +3,106 @@
 <head>
 <meta charset="utf-8">
 <title>Le Souffleur – mise en scène vidéo</title>
-<!-- Page de démo : appel visio simulé (gauche) + Le Souffleur (droite), synchronisés sur le scénario du serveur. -->
+<!-- Page de démo 1280×720 : appel visio simulé (gauche) + Le Souffleur en mode kiosque (droite),
+     synchronisés sur le minutage du scénario servi par /api/scenario. Lancement : window.start(). -->
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: #0f1217; font: 15px/1.4 "Segoe UI", system-ui, sans-serif; color: #e7eaf0; display: flex; }
-  #visio { width: 540px; display: flex; flex-direction: column; background: #1b1d24; border-right: 1px solid #2a2e38; }
-  .bar { height: 44px; display: flex; align-items: center; gap: 10px; padding: 0 14px; background: #24262f; font-size: 13px; color: #b9bfcc; }
-  .rec { width: 9px; height: 9px; border-radius: 50%; background: #ef4444; animation: blink 1.4s infinite; }
+  body { margin: 0; width: 1280px; height: 720px; overflow: hidden; background: #07080c; font: 15px/1.4 "Segoe UI Variable", "Segoe UI", "Inter", system-ui, sans-serif; color: #eef0f6; display: flex; -webkit-font-smoothing: antialiased; }
+  #visio { width: 540px; display: flex; flex-direction: column; background: #111318; border-right: 1px solid #22262f; }
+  .bar { height: 46px; display: flex; align-items: center; gap: 10px; padding: 0 16px; font-size: 13px; color: #aeb4c2; border-bottom: 1px solid #1d2028; }
+  .rec { display: inline-flex; align-items: center; gap: 6px; color: #ff6b6b; font-weight: 600; font-size: 12px; }
+  .rec::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #ff5050; animation: blink 1.4s infinite; }
   @keyframes blink { 50% { opacity: .3; } }
   .timer { margin-left: auto; font-variant-numeric: tabular-nums; }
-  .tiles { flex: 1; display: grid; grid-template-rows: 1fr 1fr; gap: 10px; padding: 12px; }
-  .tile { position: relative; border-radius: 12px; background: #2a2d37; display: grid; place-items: center; border: 3px solid transparent; transition: border-color .2s, box-shadow .2s; }
-  .tile.speaking { border-color: #7c83ff; box-shadow: 0 0 0 4px rgba(124, 131, 255, .25); }
-  .avatar { width: 96px; height: 96px; border-radius: 50%; display: grid; place-items: center; font-size: 34px; font-weight: 700; color: #fff; }
-  .name { position: absolute; left: 12px; bottom: 10px; font-size: 13px; background: rgba(0, 0, 0, .45); padding: 3px 9px; border-radius: 6px; }
-  .wave { position: absolute; right: 14px; bottom: 12px; display: flex; gap: 3px; align-items: flex-end; height: 18px; opacity: 0; }
-  .tile.speaking .wave { opacity: 1; }
-  .wave i { width: 4px; background: #7c83ff; border-radius: 2px; animation: wave .6s infinite ease-in-out; }
-  .wave i:nth-child(2) { animation-delay: .15s; } .wave i:nth-child(3) { animation-delay: .3s; }
-  @keyframes wave { 0%, 100% { height: 4px; } 50% { height: 18px; } }
-  .subs { min-height: 96px; margin: 0 12px 12px; padding: 12px 14px; border-radius: 10px; background: rgba(0, 0, 0, .55); font-size: 16px; }
-  .subs .who { font-size: 11px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; margin-bottom: 3px; }
-  .subs .who.commercial { color: #a5b4fc; } .subs .who.prospect { color: #fdba74; }
-  .controls { height: 52px; display: flex; justify-content: center; align-items: center; gap: 14px; background: #24262f; }
-  .controls span { width: 38px; height: 38px; border-radius: 50%; background: #3a3d48; display: grid; place-items: center; font-size: 16px; }
-  .controls .hang { background: #dc2626; }
+  .stage { position: relative; flex: 1; margin: 14px 14px 0; border-radius: 16px; overflow: hidden; background: radial-gradient(120% 90% at 50% 20%, #2b2f3d, #16181f); border: 3px solid transparent; transition: border-color .25s, box-shadow .25s; }
+  .stage.speaking { border-color: #8b7dff; box-shadow: 0 0 0 5px rgba(139, 125, 255, .18); }
+  .person { position: absolute; inset: 0; display: grid; place-items: center; }
+  .avatar { width: 132px; height: 132px; border-radius: 50%; display: grid; place-items: center; font-size: 46px; font-weight: 700; color: #fff; background: linear-gradient(135deg, #f97316, #c2410c); box-shadow: 0 0 0 0 rgba(249, 115, 22, .5); }
+  .stage.speaking .avatar { animation: talk 1s infinite; }
+  @keyframes talk { 0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, .45); } 100% { box-shadow: 0 0 0 26px rgba(249, 115, 22, 0); } }
+  .tag { position: absolute; left: 14px; bottom: 12px; font-size: 13px; background: rgba(0, 0, 0, .5); padding: 4px 10px; border-radius: 7px; backdrop-filter: blur(4px); }
+  .tag small { color: #aeb4c2; }
+  .pip { position: absolute; right: 14px; top: 14px; width: 150px; height: 96px; border-radius: 12px; background: #262a36; display: grid; place-items: center; border: 2px solid #33384a; transition: border-color .25s, box-shadow .25s; }
+  .pip.speaking { border-color: #8b7dff; box-shadow: 0 0 0 4px rgba(139, 125, 255, .2); }
+  .pip .avatar { width: 50px; height: 50px; font-size: 18px; background: linear-gradient(135deg, #7c6cff, #4f46e5); }
+  .pip.speaking .avatar { animation: talk2 1s infinite; }
+  @keyframes talk2 { 0% { box-shadow: 0 0 0 0 rgba(124, 108, 255, .5); } 100% { box-shadow: 0 0 0 14px rgba(124, 108, 255, 0); } }
+  .pip span { position: absolute; left: 8px; bottom: 5px; font-size: 11px; color: #cfd3dd; }
+  .subs { min-height: 104px; margin: 12px 14px; padding: 13px 16px; border-radius: 12px; background: #1a1d25; font-size: 17px; line-height: 1.45; }
+  .subs .who { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; margin-bottom: 4px; }
+  .subs .who.commercial { color: #a99fff; } .subs .who.prospect { color: #ffab76; }
+  .subs .w { opacity: .22; transition: opacity .15s; } .subs .w.on { opacity: 1; }
+  .controls { height: 58px; display: flex; justify-content: center; align-items: center; gap: 12px; border-top: 1px solid #1d2028; }
+  .controls span { width: 40px; height: 40px; border-radius: 50%; background: #262a36; display: grid; place-items: center; }
+  .controls .hang { background: #e5484d; width: 56px; border-radius: 20px; }
+  .controls svg { width: 18px; height: 18px; }
   #souffleur { flex: 1; position: relative; }
   iframe { width: 100%; height: 100%; border: 0; display: block; }
-  .callout { position: absolute; left: 50%; bottom: 22px; transform: translate(-50%, 20px); background: #4f46e5; color: #fff; font-weight: 600; padding: 9px 16px; border-radius: 99px; box-shadow: 0 8px 24px rgba(0, 0, 0, .4); opacity: 0; transition: all .4s; white-space: nowrap; }
+  .callout { position: absolute; left: 50%; bottom: 20px; transform: translate(-50%, 16px); display: flex; align-items: center; gap: 10px; background: rgba(12, 14, 20, .92); border: 1px solid #2d3345; color: #fff; font-weight: 600; font-size: 14px; padding: 9px 16px 9px 10px; border-radius: 99px; box-shadow: 0 12px 30px rgba(0, 0, 0, .5); opacity: 0; transition: all .35s; white-space: nowrap; }
   .callout.show { opacity: 1; transform: translate(-50%, 0); }
+  .callout .k { font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; padding: 4px 9px; border-radius: 99px; color: #0c0e14; }
+  .overlay { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; background: radial-gradient(80% 80% at 50% 40%, #171b2c, #07080c); z-index: 10; transition: opacity .6s; }
+  .overlay.hide { opacity: 0; pointer-events: none; }
+  .logo { width: 74px; height: 74px; margin: 0 auto 18px; border-radius: 22px; background: linear-gradient(135deg, #7c6cff, #22d3ee); display: grid; place-items: center; box-shadow: 0 20px 60px -10px rgba(124, 108, 255, .6); }
+  .overlay h1 { margin: 0; font-size: 46px; letter-spacing: -.02em; }
+  .overlay p { margin: 10px 0 0; font-size: 19px; color: #aeb4c2; }
+  .points { display: flex; gap: 16px; justify-content: center; margin-top: 30px; }
+  .points div { width: 260px; padding: 16px 18px; border-radius: 14px; background: #141824; border: 1px solid #262c3d; text-align: left; font-size: 15px; }
+  .points b { display: block; font-size: 24px; margin-bottom: 4px; background: linear-gradient(90deg, #a99fff, #22d3ee); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .fine { margin-top: 26px; font-size: 12px; color: #6b7288; }
 </style>
 </head>
 <body>
 <div id="visio">
-  <div class="bar"><span class="rec"></span> Visio · RDV découverte <span class="timer" id="timer">00:00</span></div>
-  <div class="tiles">
-    <div class="tile" id="tile-prospect"><div class="avatar" style="background:#c2410c">CM</div><span class="name">Claire Martin · prospect</span><div class="wave"><i></i><i></i><i></i></div></div>
-    <div class="tile" id="tile-commercial"><div class="avatar" style="background:#4338ca">MA</div><span class="name">Maxime · commercial (vous)</span><div class="wave"><i></i><i></i><i></i></div></div>
+  <div class="bar"><span class="rec">REC</span> Visio · RDV découverte <span class="timer" id="timer">00:00</span></div>
+  <div class="stage" id="tile-prospect">
+    <div class="person"><div class="avatar">CM</div></div>
+    <span class="tag">Claire Martin <small>· Dir. Études & Prospective</small></span>
+    <div class="pip" id="tile-commercial"><div class="avatar">MA</div><span>Maxime (vous)</span></div>
   </div>
   <div class="subs" id="subs"></div>
-  <div class="controls"><span>🎤</span><span>📷</span><span>🖥️</span><span class="hang">📞</span></div>
+  <div class="controls">
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="#cfd3dd" stroke-width="2" stroke-linecap="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="#cfd3dd" stroke-width="2" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-3v10l-5-3z"/></svg></span>
+    <span><svg viewBox="0 0 24 24" fill="none" stroke="#cfd3dd" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></span>
+    <span class="hang"><svg viewBox="0 0 24 24" fill="#fff"><path d="M12 9c-2.4 0-4.7.5-6.8 1.4-.7.3-1.2 1-1.2 1.8v2.3c0 .8.8 1.4 1.6 1.1l2.9-1c.6-.2 1-.8 1-1.4v-1.6a12 12 0 0 1 5 0v1.6c0 .6.4 1.2 1 1.4l2.9 1c.8.3 1.6-.3 1.6-1.1v-2.3c0-.8-.5-1.5-1.2-1.8A17 17 0 0 0 12 9z"/></svg></span>
+  </div>
 </div>
 <div id="souffleur">
-  <iframe id="app" src="/"></iframe>
-  <div class="callout" id="callout">💡 Réponse guidée affichée au commercial en temps réel</div>
+  <iframe id="app" src="/?kiosk&theme=dark"></iframe>
+  <div class="callout" id="callout"><span class="k" id="calloutK"></span><span id="calloutT"></span></div>
 </div>
+
+<div class="overlay" id="intro">
+  <div>
+    <div class="logo"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 10v4M8 6v12M12 9v6M16 4v16M20 10v4"/></svg></div>
+    <h1>Le Souffleur</h1>
+    <p>La bonne réponse, au bon moment, en plein rendez-vous.</p>
+  </div>
+</div>
+<div class="overlay hide" id="outro">
+  <div>
+    <div class="logo"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><path d="M4 10v4M8 6v12M12 9v6M16 4v16M20 10v4"/></svg></div>
+    <h1>Le Souffleur</h1>
+    <p>Le copilote temps réel des RDV de découverte</p>
+    <div class="points">
+      <div><b>En direct</b>une réponse guidée à chaque question ou objection</div>
+      <div><b>Sourcé</b>à partir de vos documents internes, rien d'inventé</div>
+      <div><b>0 oubli</b>la checklist de découverte suivie en direct</div>
+    </div>
+    <div class="fine">Démonstration scénarisée · personnages fictifs · voix de synthèse</div>
+  </div>
+</div>
+
 <script>
 const app = document.getElementById("app");
+const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+const KIND = {
+  question: ["Question détectée", "#4ea8ff", "Réponse guidée affichée"],
+  objection: ["Objection détectée", "#ff8a4c", "Argument sourcé prêt à dire"],
+  signal_achat: ["Signal d'achat", "#34d399", "Prochaine étape suggérée"],
+};
 
 async function ready() {
   await new Promise((ok) => (app.contentDocument?.readyState === "complete" ? ok() : app.addEventListener("load", ok, { once: true })));
@@ -58,23 +110,35 @@ async function ready() {
   while (!btn() || btn().disabled) await new Promise((ok) => setTimeout(ok, 100));
 }
 
+function speak(r, dureeMs) {
+  document.querySelectorAll(".speaking").forEach((el) => el.classList.remove("speaking"));
+  $(`tile-${r.qui}`).classList.add("speaking");
+  const mots = r.texte.split(" ");
+  $("subs").innerHTML = `<div class="who ${r.qui}">${r.qui === "prospect" ? "Claire Martin" : "Maxime"}</div>` + mots.map((m) => `<span class="w">${esc(m)}</span>`).join(" ");
+  const spans = $("subs").querySelectorAll(".w");
+  spans.forEach((s, i) => setTimeout(() => s.classList.add("on"), (dureeMs * i) / mots.length));
+  setTimeout(() => $(`tile-${r.qui}`).classList.remove("speaking"), dureeMs);
+}
+
+function callout(kind) {
+  const [k, color, txt] = KIND[kind] || KIND.question;
+  $("calloutK").textContent = k; $("calloutK").style.background = color; $("calloutT").textContent = txt;
+  $("callout").classList.add("show");
+  clearTimeout(callout.t); callout.t = setTimeout(() => $("callout").classList.remove("show"), 2600);
+}
+
 window.start = async () => {
-  const { repliques } = await (await fetch("/api/scenario")).json();
+  const { repliques, finMs } = await (await fetch("/api/scenario")).json();
   app.contentDocument.getElementById("btnDemo").click();
   const t0 = Date.now();
-  setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); document.getElementById("timer").textContent = `00:${String(s).padStart(2, "0")}`; }, 250);
-  repliques.forEach((r, i) => setTimeout(() => {
-    document.querySelectorAll(".tile").forEach((el) => el.classList.remove("speaking"));
-    document.getElementById(`tile-${r.qui}`).classList.add("speaking");
-    document.getElementById("subs").innerHTML = `<div class="who ${r.qui}">${r.qui === "prospect" ? "Claire Martin" : "Maxime"}</div>${esc(r.texte)}`;
-    const next = repliques[i + 1];
-    setTimeout(() => document.getElementById(`tile-${r.qui}`).classList.remove("speaking"), next ? next.t - r.t - 300 : 2500);
-  }, r.t));
-  // Bulle d'explication dès qu'une carte apparaît dans le Souffleur
-  const obs = new MutationObserver(() => {
-    if (app.contentDocument.querySelector(".card")) { document.getElementById("callout").classList.add("show"); obs.disconnect(); }
-  });
-  obs.observe(app.contentDocument.getElementById("cards"), { childList: true });
+  setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); $("timer").textContent = `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`; }, 250);
+  setTimeout(() => $("intro").classList.add("hide"), Math.max(600, repliques[0].debut - 700));
+  repliques.forEach((r) => setTimeout(() => speak(r, r.t - r.debut - 250), r.debut));
+  // bulle d'explication à chaque nouvelle carte affichée dans le Souffleur
+  const kinds = repliques.filter((r) => r.carte).map((r) => r.carte);
+  let n = 0;
+  new MutationObserver(() => app.contentDocument.getElementById("nbCards").textContent && callout(kinds[n++])).observe(app.contentDocument.getElementById("nbCards"), { childList: true, characterData: true, subtree: true });
+  if (finMs) setTimeout(() => $("outro").classList.remove("hide"), finMs + 1800);
 };
 
 window.appReady = ready();

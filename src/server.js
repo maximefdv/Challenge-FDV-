@@ -13,10 +13,10 @@ const mode = resolveMode({ forceMock: process.argv.includes("--mock"), hasKey: c
 
 const app = express();
 app.use(express.static("public"));
-// Texte du scénario (sans analyses) pour la page de mise en scène vidéo public/video.html
+// Minutage du scénario (sans le contenu des cartes) pour la page de mise en scène vidéo public/video.html
 app.get("/api/scenario", (_req, res) => {
-  const { titre, repliques } = loadScenario(DEMO_FILE);
-  res.json({ titre, repliques: repliques.map(({ t, qui, texte }) => ({ t, qui, texte })) });
+  const { titre, finMs, repliques } = loadScenario(DEMO_FILE);
+  res.json({ titre, finMs, repliques: repliques.map(({ t, debut, qui, texte, analyse }) => ({ t, debut: debut ?? t, qui, texte, carte: analyse?.carte ? analyse.declencheur : null })) });
 });
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server, path: "/ws" });

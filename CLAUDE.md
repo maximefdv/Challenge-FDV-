@@ -16,7 +16,8 @@ Stack : Pipedrive, Lemlist, Lusha, M365/Outlook, Gmail, Google Calendar, Skipcal
 2. Plan → VALIDÉ. Contexte équipe : Teams desktop + Windows (capture = partage écran + son système)
 3. Dev : 1-3 FAITES (KB fictive, moteur src/souffleur.js, UI public/index.html + src/server.js ws, --mock).
    Prochaine : 4 (audio Teams → Deepgram 2 canaux). Docs Xerfi + checklist.json dans knowledge/private, scénario demo/private (gitignorés).
-   Pas de budget clé Anthropic → mode "precalc" (analyses pré-calculées dans le scénario) par défaut sans clé
+   Pas de budget clé Anthropic → mode "precalc" par défaut. UI v2 "produit" (?kiosk&theme=dark). Vidéo 1 min
+   (public/video.html + TTS Kokoro, outillage hors repo). Scénarios demo/private/video-60s.json
 
 ## Idées (Phase 1)
 - A-F proposées. Retenue : D "Le Souffleur" = copilote live en RDV découverte
