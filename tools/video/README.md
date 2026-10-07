@@ -4,11 +4,11 @@
 2. Voix françaises (Piper, format sherpa-onnx) dans `tools/video/voices/` :
    ```bash
    pip install sherpa-onnx soundfile numpy imageio-ffmpeg
-   for v in fr_FR-tom-medium fr_FR-siwis-medium; do
-     curl -L https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/vits-piper-$v.tar.bz2 | tar xj -C tools/video/voices
+   for v in vits-piper-fr_FR-upmc-medium vits-piper-fr_FR-siwis-medium vits-piper-fr_FR-tom-medium vits-coqui-fr-css10; do
+     curl -L https://github.com/k2-fsa/sherpa-onnx/releases/download/tts-models/$v.tar.bz2 | tar xj -C tools/video/voices
    done
    ```
-   Autres voix : `fr_FR-upmc-medium` (Jessica = locuteur 0, Pierre = 1). `VOIX_COMMERCIAL` / `VOIX_PROSPECT` pour changer.
+   Voix : `pierre`, `tom`, `gilles` (hommes) · `siwis`, `jessica` (femmes). Choix : `VOIX_COMMERCIAL=gilles VOIX_PROSPECT=siwis`, débit : `VITESSE=1.21`.
 3. Générer, enregistrer, monter :
    ```bash
    python tools/video/build.py demo/private/script-video.md demo/private/video.json

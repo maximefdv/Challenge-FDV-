@@ -7,10 +7,16 @@ import json, os, re, sys
 import numpy as np, sherpa_onnx, soundfile as sf
 
 VOICES_DIR = os.environ.get("VOICES_DIR", "tools/video/voices")
-VOIX = {  # rôle -> (modèle, locuteur, vitesse : <1 = plus posé)
-    "commercial": (os.environ.get("VOIX_COMMERCIAL", "fr_FR-tom-medium"), 0, 0.96),
-    "prospect": (os.environ.get("VOIX_PROSPECT", "fr_FR-siwis-medium"), 0, 0.96),
+# Voix disponibles (dossier dans VOICES_DIR, fichier modèle, locuteur). upmc : 0 = Jessica, 1 = Pierre.
+VOIX_DISPO = {
+    "tom": ("vits-piper-fr_FR-tom-medium", "fr_FR-tom-medium.onnx", 0),
+    "pierre": ("vits-piper-fr_FR-upmc-medium", "fr_FR-upmc-medium.onnx", 1),
+    "jessica": ("vits-piper-fr_FR-upmc-medium", "fr_FR-upmc-medium.onnx", 0),
+    "siwis": ("vits-piper-fr_FR-siwis-medium", "fr_FR-siwis-medium.onnx", 0),
+    "gilles": ("vits-coqui-fr-css10", "model.onnx", 0),
 }
+VITESSE = float(os.environ.get("VITESSE", "1.21"))  # >1 = plus rapide
+VOIX = {"commercial": os.environ.get("VOIX_COMMERCIAL", "pierre"), "prospect": os.environ.get("VOIX_PROSPECT", "siwis")}
 ROLES = {"maxime": "commercial", "commercial": "commercial", "claire": "prospect", "prospect": "prospect"}
 INTRO, PAUSE, PAUSE_CARTE, FIN_TRANSCRIPTION = 2.4, 0.9, 2.8, 0.4  # secondes
 
@@ -47,13 +53,14 @@ def prononce(texte):
 
 _tts = {}
 def synth(role, texte, out):
-    name, sid, speed = VOIX[role]
-    if name not in _tts:
-        d = f"{VOICES_DIR}/vits-piper-{name}"
-        _tts[name] = sherpa_onnx.OfflineTts(sherpa_onnx.OfflineTtsConfig(model=sherpa_onnx.OfflineTtsModelConfig(
-            vits=sherpa_onnx.OfflineTtsVitsModelConfig(model=f"{d}/{name}.onnx", tokens=f"{d}/tokens.txt", data_dir=f"{d}/espeak-ng-data"),
+    dossier, modele, sid = VOIX_DISPO[VOIX[role]]
+    if dossier not in _tts:
+        d = f"{VOICES_DIR}/{dossier}"
+        espeak = f"{d}/espeak-ng-data" if os.path.isdir(f"{d}/espeak-ng-data") else ""
+        _tts[dossier] = sherpa_onnx.OfflineTts(sherpa_onnx.OfflineTtsConfig(model=sherpa_onnx.OfflineTtsModelConfig(
+            vits=sherpa_onnx.OfflineTtsVitsModelConfig(model=f"{d}/{modele}", tokens=f"{d}/tokens.txt", data_dir=espeak),
             num_threads=4)))
-    a = _tts[name].generate(prononce(texte), sid=sid, speed=speed)
+    a = _tts[dossier].generate(prononce(texte), sid=sid, speed=VITESSE)
     s = np.array(a.samples, dtype=np.float32)
     sf.write(out, s, a.sample_rate)
     return len(s) / a.sample_rate
