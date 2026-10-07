@@ -37,6 +37,14 @@ def parse(md):
             cur["texte"] = (cur["texte"] + " " + line).strip()
     return titre, reps
 
+# Texte prononcé : nombres groupés, unités et sigles lus correctement par la voix de synthèse
+PRONONCIATION = [(r"(\d) (\d{3})", r"\1\2"), (r"€ ?HT", "euros hors taxes"), (r"€", "euros"), (r"\bChatGPT\b", "Tchatte G P T"),
+                 (r"\bLLM\b", "L L M"), (r"\bCSV\b", "C S V"), (r"\bDG\b", "D G"), (r"…", ",")]
+def prononce(texte):
+    for motif, rempl in PRONONCIATION:
+        texte = re.sub(motif, rempl, texte)
+    return texte
+
 _tts = {}
 def synth(role, texte, out):
     name, sid, speed = VOIX[role]
@@ -45,7 +53,7 @@ def synth(role, texte, out):
         _tts[name] = sherpa_onnx.OfflineTts(sherpa_onnx.OfflineTtsConfig(model=sherpa_onnx.OfflineTtsModelConfig(
             vits=sherpa_onnx.OfflineTtsVitsModelConfig(model=f"{d}/{name}.onnx", tokens=f"{d}/tokens.txt", data_dir=f"{d}/espeak-ng-data"),
             num_threads=4)))
-    a = _tts[name].generate(texte, sid=sid, speed=speed)
+    a = _tts[name].generate(prononce(texte), sid=sid, speed=speed)
     s = np.array(a.samples, dtype=np.float32)
     sf.write(out, s, a.sample_rate)
     return len(s) / a.sample_rate

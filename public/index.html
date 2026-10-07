@@ -189,7 +189,7 @@ function handle(m) {
     labels = m.checklist; etat = {}; latences = []; termine = false; cartes = [];
     $("titre").textContent = m.titre; $("lines").innerHTML = ""; $("latence").textContent = "";
     $("hero").className = "idle"; $("hero").innerHTML = '<div><div class="wave"><i></i><i></i><i></i><i></i><i></i></div>À l\'écoute du prospect…</div>';
-    $("history").hidden = true; $("history").querySelectorAll(".hist").forEach((e) => e.remove()); $("nbCards").textContent = "";
+    $("history").hidden = true; $("history").querySelectorAll(".hist").forEach((e) => e.remove()); $("history").querySelector(".history-t").textContent = "Déjà traité"; $("nbCards").textContent = "";
     t0 = Date.now(); clearInterval(timer); timer = setInterval(() => setLive(true, `En écoute · ${clock()}`), 500); setLive(true, "En écoute · 00:00");
     renderChecklist(); $("btnStop").disabled = false;
   } else if (m.type === "replique") {
@@ -218,6 +218,9 @@ function showCard(m) {
     h.className = `hist ${prev.declencheur}`;
     h.innerHTML = `<span class="t">${esc(prev.carte.titre)}</span><span class="k">${TYPES[prev.declencheur]}</span>`;
     $("history").querySelector(".history-t").after(h); $("history").hidden = false;
+    const hist = $("history").querySelectorAll(".hist"); // on garde les 4 plus récentes
+    if (hist.length > 4) hist[hist.length - 1].remove();
+    $("history").querySelector(".history-t").textContent = cartes.length > 4 ? `Déjà traité · ${cartes.length} cartes` : "Déjà traité";
   }
   cartes.push({ ...m, at: clock() });
   $("nbCards").textContent = `${cartes.length} carte${cartes.length > 1 ? "s" : ""}`;
