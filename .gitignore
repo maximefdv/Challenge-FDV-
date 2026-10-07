@@ -7,3 +7,4 @@ sessions/
 demo/private/
 tools/video/voices
 out/
+__pycache__/
